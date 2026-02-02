@@ -1,5 +1,7 @@
+from urllib import response
 import pandas as pd
 from fastapi import HTTPException
+from app.utils.json_sanitizer import sanitize
 
 def analyze_csv(file, preview_rows: int = 5):
     if not file.filename.endswith(".csv"):
@@ -27,7 +29,7 @@ def analyze_csv(file, preview_rows: int = 5):
 
     preview_data = df.head(preview_rows).to_dict(orient="records")
 
-    return {
+    response = {
         "filename": file.filename,
         "total_rows": len(df),
         "total_columns": len(columns),
@@ -36,3 +38,5 @@ def analyze_csv(file, preview_rows: int = 5):
         "null_summary": null_info,
         "preview": preview_data
     }
+
+    return sanitize(response)

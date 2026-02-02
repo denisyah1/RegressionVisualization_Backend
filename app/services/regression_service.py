@@ -1,3 +1,4 @@
+import math
 from fastapi import HTTPException
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -47,6 +48,11 @@ def run_regression(file, target_column, feature_columns, null_strategy=None):
         test_size=TRAIN_TEST_SPLIT_RATIO,
         random_state=42
     )
+    if len(y_test) < 2:
+        raise HTTPException(
+            status_code=400,
+            detail="Not enough test samples to evaluate regression. Please provide more data."
+        )
 
     models = get_regression_models(preprocessor)
 
@@ -64,6 +70,9 @@ def run_regression(file, target_column, feature_columns, null_strategy=None):
 
             train_r2 = r2_score(y_train, train_pred)
             test_r2 = r2_score(y_test, test_pred)
+
+            if math.isnan(test_r2):
+                test_r2 = None
             test_mse = mean_squared_error(y_test, test_pred)
 
             results[name] = {
@@ -72,8 +81,8 @@ def run_regression(file, target_column, feature_columns, null_strategy=None):
                 "test_mse": test_mse
             }
 
-            if test_r2 > best_r2:
-                best_r2 = test_r2
+            if test_r2 is not None and test_r2 > best_r2:
+                best_r2 = -1e9
                 best_model_name = name
                 best_model = model
                 best_test_pred = test_pred
