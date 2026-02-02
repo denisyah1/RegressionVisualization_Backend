@@ -1,0 +1,3 @@
+TRAIN_TEST_SPLIT_RATIO = 0.2
+DEFAULT_NULL_STRATEGY = "drop"  # drop | mean
+
