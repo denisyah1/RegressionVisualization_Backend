@@ -5,6 +5,8 @@ from app.utils.csv_preview import analyze_csv
 from app.services.regression_service import run_regression
 from app.services.plot_store import PLOT_STORE
 from fastapi import HTTPException
+from app.utils.csv_loader import load_csv
+from app.utils.eda_analyzer import analyze_eda
 
 app = FastAPI(title="Regression Visualization API")
 
@@ -66,3 +68,12 @@ async def download_model(filename: str):
         media_type="application/octet-stream",
         filename=filename
     )
+
+# =========================
+# EDA ANALYSIS
+# =========================
+
+@app.post("/api/csv/eda")
+async def csv_eda(file: UploadFile = File(...)):
+    df = load_csv(file)
+    return analyze_eda(df)

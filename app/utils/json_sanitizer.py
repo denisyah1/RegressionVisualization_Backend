@@ -1,6 +1,16 @@
 import math
+import numpy as np
 
 def sanitize(obj):
+    # numpy scalar → python native
+    if isinstance(obj, (np.integer,)):
+        return int(obj)
+
+    if isinstance(obj, (np.floating,)):
+        if math.isnan(obj) or math.isinf(obj):
+            return None
+        return float(obj)
+
     if isinstance(obj, float):
         if math.isnan(obj) or math.isinf(obj):
             return None
