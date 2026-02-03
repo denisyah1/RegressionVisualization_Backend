@@ -1,9 +1,10 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import FileResponse
 import os
-
 from app.utils.csv_preview import analyze_csv
 from app.services.regression_service import run_regression
+from app.services.plot_store import PLOT_STORE
+from fastapi import HTTPException
 
 app = FastAPI(title="Regression Visualization API")
 
@@ -33,6 +34,22 @@ async def regression(
         feature_columns=features,
         null_strategy=null_strategy
     )
+#==========================
+# GET PLOT
+#==========================
+
+from app.services.plot_store import PLOT_STORE
+from fastapi import HTTPException
+
+@app.get("/api/regression/plot")
+def get_regression_plot():
+    if "last" not in PLOT_STORE:
+        raise HTTPException(
+            status_code=404,
+            detail="No regression plot data available. Run regression first."
+        )
+
+    return PLOT_STORE["last"]
 
 # =========================
 # DOWNLOAD SAVED MODEL

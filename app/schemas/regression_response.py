@@ -1,14 +1,14 @@
 from pydantic import BaseModel
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-class PlotData(BaseModel):
-    x: Dict[str, List[float]]
-    y_actual: List[float]
-    y_pred: List[float]
+class ModelMetric(BaseModel):
+    train_r2: Optional[float]
+    test_r2: Optional[float]
+    test_mse: Optional[float]
 
 class RegressionResponse(BaseModel):
-    coefficients: List[float]
-    intercept: float
-    mse: float
-    r2: float
-    plot_data: PlotData
+    best_model: str
+    model_comparison: Dict[str, ModelMetric]
+    feature_engineering: Dict[str, List[str]]
+    data_info: Dict[str, int | str]
+    saved_model_filename: str

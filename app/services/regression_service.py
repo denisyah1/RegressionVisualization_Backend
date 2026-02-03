@@ -1,4 +1,5 @@
 import math
+from urllib import response
 from fastapi import HTTPException
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -10,6 +11,7 @@ from app.services.preprocessing import build_preprocessor
 from app.services.model_factory import get_regression_models
 from app.utils.model_storage import save_model
 from app.utils.json_sanitizer import sanitize
+from app.services.plot_store import PLOT_STORE
 from app.core.config import DEFAULT_NULL_STRATEGY, TRAIN_TEST_SPLIT_RATIO
 
 def run_regression(file, target_column, feature_columns, null_strategy=None):
@@ -87,6 +89,17 @@ def run_regression(file, target_column, feature_columns, null_strategy=None):
                 best_model = model
                 best_test_pred = test_pred
 
+            PLOT_STORE["last"] = {
+                "train": {
+                    "y_actual": y_train.tolist(),
+                    "y_pred": best_model.predict(X_train).tolist()
+                },
+                "test": {
+                    "y_actual": y_test.tolist(),
+                    "y_pred": best_test_pred.tolist()
+                }
+            }
+
         except Exception as e:
             results[name] = {"error": str(e)}
 
@@ -97,15 +110,20 @@ def run_regression(file, target_column, feature_columns, null_strategy=None):
     saved_model_info = save_model(best_model, best_model_name)
 
     response = {
-    "best_model": best_model_name,
-    "feature_engineering": {
-        "numeric_features": numeric_features,
-        "categorical_features": categorical_features
-    },
-    "model_comparison": results,
-    "best_model_metrics": {
-        "test_r2": best_r2,
-        "test_mse": mean_squared_error(y_test, best_test_pred)
+        "best_model": best_model_name,
+        "feature_engineering": {
+            "numeric_features": numeric_features,
+            "categorical_features": categorical_features
+        },
+        "data_info": {
+            "rows": len(df),
+            "train_rows": len(X_train),
+            "test_rows": len(X_test),
+            "null_strategy": strategy
+        },
+        "model_comparison": results,
+        "saved_model_filename": saved_model_info["filename"]
     }
-}
+
     return sanitize(response)
+
