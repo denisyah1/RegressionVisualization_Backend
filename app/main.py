@@ -7,8 +7,19 @@ from app.services.plot_store import PLOT_STORE
 from fastapi import HTTPException
 from app.utils.csv_loader import load_csv
 from app.utils.eda_analyzer import analyze_eda
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Regression Visualization API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # Vite default
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # =========================
 # CSV PREVIEW
