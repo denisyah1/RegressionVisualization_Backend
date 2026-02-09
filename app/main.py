@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import FileResponse
 import os
 from app.utils.csv_preview import analyze_csv
@@ -36,9 +36,9 @@ async def preview_csv(
 @app.post("/api/regression")
 async def regression(
     file: UploadFile = File(...),
-    target_column: str = "",
-    feature_columns: str = "",
-    null_strategy: str = "drop"
+    target_column: str = Form(...),
+    feature_columns: str = Form(...),
+    null_strategy: str = Form("drop")
 ):
     features = [c.strip() for c in feature_columns.split(",") if c.strip()]
     return run_regression(
@@ -98,4 +98,3 @@ from app.utils.recommendation_engine import recommend_regression_columns
 async def csv_recommendation(file: UploadFile = File(...)):
     df = load_csv(file)
     return recommend_regression_columns(df)
-
