@@ -38,7 +38,7 @@ async def regression(
     file: UploadFile = File(...),
     target_column: str = Form(...),
     feature_columns: str = Form(...),
-    null_strategy: str = Form("drop")
+    null_strategy: str = Form("auto")
 ):
     features = [c.strip() for c in feature_columns.split(",") if c.strip()]
     return run_regression(

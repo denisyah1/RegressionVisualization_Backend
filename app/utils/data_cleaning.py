@@ -8,16 +8,16 @@ def clean_dataframe(df: pd.DataFrame, features: list, target: str, strategy: str
     if strategy == "drop":
         df = df.dropna()
 
-    elif strategy == "mean":
+    elif strategy in {"mean", "auto"}:
         for col in df.columns:
             if pd.api.types.is_numeric_dtype(df[col]):
                 if df[col].isnull().any():
                     df[col] = df[col].fillna(df[col].mean())
             else:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Column '{col}' is not numeric and cannot be mean-imputed"
-                )
+                if df[col].isnull().any():
+                    mode = df[col].mode(dropna=True)
+                    fill_value = mode.iloc[0] if not mode.empty else "Unknown"
+                    df[col] = df[col].fillna(fill_value)
     else:
         raise HTTPException(
             status_code=400,

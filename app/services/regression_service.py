@@ -1,4 +1,5 @@
 import math
+import pandas as pd
 from fastapi import HTTPException
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -26,6 +27,18 @@ def run_regression(
     # =====================================================
     df = load_csv(file)
 
+    # Normalize column names to avoid whitespace mismatches
+    original_cols = list(df.columns)
+    stripped_cols = [c.strip() if isinstance(c, str) else c for c in original_cols]
+    if len(set(stripped_cols)) != len(stripped_cols):
+        raise HTTPException(400, "Duplicate columns detected after trimming spaces")
+    if stripped_cols != original_cols:
+        df.columns = stripped_cols
+    if target_column:
+        target_column = target_column.strip()
+    if feature_columns:
+        feature_columns = [c.strip() for c in feature_columns]
+
     if not feature_columns:
         raise HTTPException(400, "Feature columns cannot be empty")
 
@@ -51,6 +64,12 @@ def run_regression(
 
     X = df[feature_columns]
     y = df[target_column]
+
+    if not pd.api.types.is_numeric_dtype(y):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Target column '{target_column}' must be numeric for regression"
+        )
 
     # =====================================================
     # FEATURE TYPE DETECTION
