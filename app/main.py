@@ -88,3 +88,14 @@ async def download_model(filename: str):
 async def csv_eda(file: UploadFile = File(...)):
     df = load_csv(file)
     return analyze_eda(df)
+
+#==========================
+# regression recommendation
+#==========================
+from app.utils.recommendation_engine import recommend_regression_columns
+
+@app.post("/api/csv/recommendation")
+async def csv_recommendation(file: UploadFile = File(...)):
+    df = load_csv(file)
+    return recommend_regression_columns(df)
+
