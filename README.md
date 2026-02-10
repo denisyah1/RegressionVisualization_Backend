@@ -19,12 +19,15 @@ FastAPI service that powers CSV analysis, regression training, and export featur
 1. Create and activate a virtual environment (recommended).
 2. Install dependencies.
    ```bash
-   pip install -r requirments.txt
+   pip install -r requirements.txt
    ```
 3. Run the API server.
    ```bash
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
+4. Configure CORS origins (optional for local dev).
+   - Copy `.env.example` to `.env` and set `CORS_ORIGINS` as a comma-separated list.
+   - Example: `CORS_ORIGINS=http://localhost:5173`
 
 ## API Endpoints
 - `POST /api/csv/preview` - upload CSV and return a quick preview.
@@ -37,3 +40,4 @@ FastAPI service that powers CSV analysis, regression training, and export featur
 ## Notes
 - CORS allows `http://localhost:5173` by default for the frontend dev server.
 - Plot data is stored in-memory for the latest regression run and will reset on server restart.
+- For Railway, set `CORS_ORIGINS` in project environment variables.

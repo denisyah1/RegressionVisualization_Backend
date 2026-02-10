@@ -11,11 +11,18 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Regression Visualization API")
 
+cors_origins_env = os.getenv("CORS_ORIGINS", "")
+cors_origins = [
+    origin.strip()
+    for origin in cors_origins_env.split(",")
+    if origin.strip()
+]
+if not cors_origins:
+    cors_origins = ["http://localhost:5173"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Vite default
-    ],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
