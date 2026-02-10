@@ -1,15 +1,39 @@
-# RegressionVisualization_Backend
-Backend files for my porto project regeression visualization
+# Regression Visualization Backend
 
-### Plot Data Storage Design
+FastAPI service that powers CSV analysis, regression training, and export features.
 
-This project uses an in-memory plot store to temporarily hold
-regression visualization data.
+## Features
+- CSV preview endpoint.
+- EDA analysis: numeric/categorical columns, summary stats, correlation matrix, head/tail preview.
+- Regression training with automatic model comparison and best-model selection.
+- Null handling strategy: `auto`, `mean`, or `drop`.
+- Regression plot data stored in-memory for quick retrieval.
+- Download saved model file (`.pkl`).
+- Column recommendation for target and features.
 
-This approach is suitable for:
-- single-user workflows
-- local development
-- portfolio demonstration
+## Tech Stack
+- FastAPI, Uvicorn
+- Pandas, NumPy, scikit-learn
 
-In a production environment, this component can be replaced
-with Redis or database-backed storage without changing the API contract.
+## Setup
+1. Create and activate a virtual environment (recommended).
+2. Install dependencies.
+   ```bash
+   pip install -r requirments.txt
+   ```
+3. Run the API server.
+   ```bash
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+## API Endpoints
+- `POST /api/csv/preview` - upload CSV and return a quick preview.
+- `POST /api/csv/eda` - return EDA summary and correlation matrix.
+- `POST /api/csv/recommendation` - suggest target/features and columns to drop.
+- `POST /api/regression` - run regression and return model comparison + saved model filename.
+- `GET /api/regression/plot` - return plot data for the last regression run.
+- `GET /api/model/download?filename=...` - download the saved model file.
+
+## Notes
+- CORS allows `http://localhost:5173` by default for the frontend dev server.
+- Plot data is stored in-memory for the latest regression run and will reset on server restart.
